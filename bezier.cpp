@@ -202,23 +202,6 @@ vector<Vector> bezcurveinterp(Curve curve, float u) {
 }
 
 
-/* populates triangle list */
-void makeTriangles() {
-    for (int i = 0; i < numSubdivisions; i++) {
-        for (int j = 0; j < numSubdivisions; j++) {
-            Triangle triangle1 = Triangle(points_to_Render[i][j], points_to_Render[i][j+1],
-                                          points_to_Render[i+1][j]);
-            Triangle triangle2 = Triangle(points_to_Render[i+1][j], points_to_Render[i][j+1],
-                                          points_to_Render[i+1][j+1]);
-            list_triangles.push_back(triangle1); list_triangles.push_back(triangle2);
-        }
-    }
-    
-    //reset all the lists
-    points_to_Render = vector<vector<Vector> >(); curlevel = vector<Vector>();
-}
-
-
 //****************************************************
 // the usual stuff, nothing exciting here
 //****************************************************
