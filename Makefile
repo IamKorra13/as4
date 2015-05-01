@@ -11,10 +11,10 @@ endif
 	
 RM = /bin/rm -f 
 all: main 
-main: bezier.o 
-	$(CC) $(CFLAGS) -o as4 bezier.o $(LDFLAGS) 
-bezier.o: bezier.cpp
-	$(CC) $(CFLAGS) -c bezier.cpp -o bezier.o
+main: iksolver.o 
+	$(CC) $(CFLAGS) -o as4 iksolver.o $(LDFLAGS) 
+iksolver.o: iksolver.cpp
+	$(CC) $(CFLAGS) -c iksolver.cpp -o iksolver.o
 clean: 
 	$(RM) *.o as4
  
