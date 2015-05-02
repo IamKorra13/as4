@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include "vector.cpp"
 #include "Eigen/Dense"
 
 using namespace Eigen;
@@ -23,8 +24,8 @@ class Arm
     public:
         Arm();
         vector<Joint*> list_joints;
-        VectorXf base;
-        VectorXf target;
+        Vector base;
+        Vector target;
         float step_size;
 };
 

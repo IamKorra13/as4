@@ -39,6 +39,33 @@ public:
 Viewport	viewport;
 int windowID;
 
+vector<Arm*> list_arm = vector<Arm*>();
+
+
+void drawArm(Arm* arm) {
+    glPushMatrix();
+    glTranslatef(arm->base.x, arm->base.y, 0.0f);
+    glutSolidSphere(0.5f, 20, 20);
+    
+    GLUquadricObj *quad = gluNewQuadric();
+    gluQuadricDrawStyle(quad, GLU_FILL);
+    gluQuadricOrientation(quad, GLU_OUTSIDE);
+    gluQuadricNormals(quad, GLU_SMOOTH);
+    
+    for (int i = 0; i < arm->list_joints.size(); i++) {
+        Joint* joint = arm->list_joints[i];
+        
+        glColor3f(1.0, 0.0, 0.0);
+        glRotatef(joint->angle, 1.0f, 0.0f, 0.0f);
+        gluCylinder(quad, 0.2, 0.2, joint->length, 20, 20);
+        glTranslatef(0, 0, joint->length);
+        
+        // Draw the sphere to show the joint position
+        glutSolidSphere(0.5, 20, 20);
+    }
+    
+    glPopMatrix();
+}
 
 
 /* Main display function. */
@@ -52,6 +79,7 @@ void display() {
     glPushMatrix();
     
     /// stuff here
+    drawArm(list_arm[0]);
     
     glPopMatrix();
     
@@ -73,7 +101,8 @@ void reshape(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     // gluOrtho2D(10, viewport.w, 10, viewport.h);
-    glOrtho(-4, 4, -4, 4, 4, -4);
+    int num = 7;
+    glOrtho(-num, num, -num, num, num, -num);
     
 }
 
@@ -86,13 +115,16 @@ void keyBoardFunc(unsigned char key, int x, int y) {
 }
 
 
+
 int main (int argc, char **argv) {
     // initialize the arm and joints
-    Arm arm = Arm();
-    Joint* joint1 = new Joint(); arm.list_joints.push_back(joint1);
-    Joint* joint2 = new Joint(); arm.list_joints.push_back(joint2);
-    Joint* joint3 = new Joint(); arm.list_joints.push_back(joint3);
-    Joint* joint4 = new Joint(); arm.list_joints.push_back(joint4);
+    Arm* arm = new Arm();
+    Joint* joint1 = new Joint(); joint1->angle = 90; arm->list_joints.push_back(joint1);
+    Joint* joint2 = new Joint(); joint2->angle = 30; arm->list_joints.push_back(joint2);
+    Joint* joint3 = new Joint(); arm->list_joints.push_back(joint3);
+    Joint* joint4 = new Joint(); arm->list_joints.push_back(joint4);
+    
+    list_arm.push_back(arm);
     
     // GLUT initialization
     glutInit(&argc, argv);
