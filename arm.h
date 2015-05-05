@@ -15,8 +15,8 @@ class Joint
     public:
         Joint();
         float length;
-        float angle;
         Vector rotation;
+        Vector p;
 };
 
 
