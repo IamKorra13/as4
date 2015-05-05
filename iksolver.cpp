@@ -127,23 +127,6 @@ void keyBoardFunc(unsigned char key, int x, int y) {
     }
 }
 
-Matrix3f rodriguez(Joint* j) {
-        Vector3f R(j->rotation.x, j->rotation.y, j->rotation.z);
-        R.normalize();
-
-        Matrix3f crossProd(3,3);
-        crossProd(0,0) = 0.0f; crossProd(0, 1) =  -(R(2)); crossProd(0,2) = R(1);
-        crossProd(1,0) = R(2); crossProd(1, 1) = 0.0; crossProd(1,2) = -(R(0));
-        crossProd(2,0) = -(R(1)); crossProd(2, 1) = R(0); crossProd(2,2) = 0.0;
-
-        Matrix3f crossProd_squ(3,3);
-        crossProd_squ = crossProd * crossProd;
-
-        float theta = j->rotation.magnitude();
-
-        return (R * R.transpose()) + sin(theta) * crossProd - cos(theta)*crossProd_squ;
-    }
-
 
 
 int main (int argc, char **argv) {
@@ -157,17 +140,14 @@ int main (int argc, char **argv) {
     Vector r3 = Vector(); bigTheta.push_back(r3);
     Vector r4 = Vector(); bigTheta.push_back(r4);
     //Rotation should be a matrix
-    Joint* j1 = new Joint(); j1->p.y = 2.0; j1->rotation = r1; arm->list_joints.push_back(j1);
-    Joint* j2 = new Joint(); j2->p.y = 4.0; j2->rotation = r2; arm->list_joints.push_back(j2);
-    Joint* j3 = new Joint(); j3->p.y = 6.0; j3->rotation = r3; arm->list_joints.push_back(j3);
-    Joint* j4 = new Joint(); j4->p.y = 8.0; j4->rotation = r4; arm->list_joints.push_back(j4);
+    Joint* j1 = new Joint(); j1->rotation = r1; arm->list_joints.push_back(j1);
+    Joint* j2 = new Joint(); j2->rotation = r2; arm->list_joints.push_back(j2);
+    Joint* j3 = new Joint(); j3->rotation = r3; arm->list_joints.push_back(j3);
+    Joint* j4 = new Joint(); j4->rotation = r4; arm->list_joints.push_back(j4);
     
     list_arm.push_back(arm);
 
-    r1.normalize(); r2.normalize(); r3.normalize(); r4.normalize();
-
-    Matrix3f R1; R1 = rodriguez(j1); cout << R1;
-
+    arm->list_joints[0]->rodrigues();
 
     // GLUT initialization
     glutInit(&argc, argv);

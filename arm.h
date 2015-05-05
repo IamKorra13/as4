@@ -17,6 +17,9 @@ class Joint
         float length;
         Vector rotation;
         Vector p;
+
+        Matrix4f rodrigues();
+        Matrix4f transformation();
 };
 
 
@@ -29,8 +32,8 @@ class Arm
         Vector target;
         vector<Vector> rotations;
         float step_size;
-    
-        Vector get_endpoint(vector<Vector>);
+        
+        Vector F(vector<Vector>); /* get endpoint of the arm */
 };
 
 #endif
