@@ -40,6 +40,10 @@ Viewport	viewport;
 int windowID;
 
 vector<Arm*> list_arm = vector<Arm*>();
+// The initial location of point P
+Vector p = Vector(); 
+//Goal point 
+Vector g = Vector();
 
 
 void drawArm(Arm* arm) {
@@ -55,19 +59,28 @@ void drawArm(Arm* arm) {
     for (int i = 0; i < arm->list_joints.size(); i++) {
         Joint* joint = arm->list_joints[i];
         
-        glColor3f(1.0, 0.0, 0.0);
-        glRotatef(joint->angle, 1.0f, 0.0f, 0.0f);
+        glColor3f(1.0, 0.0, 1.0);
+        glRotatef(joint->rotation.x, 1.0f, 0.0f, 0.0f);
+        glRotatef(joint->rotation.y, 0.0f, 1.0f, 0.0f);
+        glRotatef(joint->rotation.z, 0.0f, 0.0f, 1.0f);
         gluCylinder(quad, 0.2, 0.2, joint->length, 20, 20);
         glTranslatef(0, 0, joint->length);
         
         // Draw the sphere to show the joint position
-        glutSolidSphere(0.5, 20, 20);
+        if (i < 3) {
+            glutSolidSphere(0.5, 20, 20);
+        }
     }
-    
+    //draw P
+    glColor3f(0.0, 0.0, 1.0);
+    glutSolidSphere(0.5, 20, 20);
+
     glPopMatrix();
 }
 
-
+void drawGoal() {
+    
+}
 /* Main display function. */
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -80,7 +93,7 @@ void display() {
     
     /// stuff here
     drawArm(list_arm[0]);
-    
+    drawGoal();
     glPopMatrix();
     
     glFlush();
@@ -101,7 +114,7 @@ void reshape(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     // gluOrtho2D(10, viewport.w, 10, viewport.h);
-    int num = 7;
+    int num = 12;
     glOrtho(-num, num, -num, num, num, -num);
     
 }
@@ -114,18 +127,37 @@ void keyBoardFunc(unsigned char key, int x, int y) {
     }
 }
 
-
+Matrix4f rodriguez(Joint* j) {
+        Matrix3f crossProd(3,3);
+        crossProd(0,0) = 0.0f; crossProd(0, 1) =  -(j->rotation.z); crossProd(0,2) = j->rotation.y;
+        crossProd(1,0) = j->rotation.z; crossProd(1, 1) = 0.0; crossProd(1,2) = -(j->rotation.x);
+        crossProd(2,0) = -(j->rotation.y); crossProd(2, 1) = j->rotation.x; crossProd(2,2) = 0.0;
+        cout << crossProd << endl;
+    }
 
 int main (int argc, char **argv) {
     // initialize the arm and joints
     Arm* arm = new Arm();
-    Joint* joint1 = new Joint(); joint1->angle = 90; arm->list_joints.push_back(joint1);
-    Joint* joint2 = new Joint(); joint2->angle = 30; arm->list_joints.push_back(joint2);
-    Joint* joint3 = new Joint(); arm->list_joints.push_back(joint3);
-    Joint* joint4 = new Joint(); arm->list_joints.push_back(joint4);
+    vector<Vector> bigTheta;
+
+    //All angles ri = 0
+    Vector r1 = Vector(); r1.x = 30; r1.y = 60; r1.z = 90; bigTheta.push_back(r1);
+    Vector r2 = Vector(); bigTheta.push_back(r2);
+    Vector r3 = Vector(); bigTheta.push_back(r3);
+    Vector r4 = Vector(); bigTheta.push_back(r4);
+    //Rotation should be a matrix
+    Joint* j1 = new Joint(); j1->p.y = 2.0; j1->rotation = r1; arm->list_joints.push_back(j1);
+    Joint* j2 = new Joint(); j2->p.y = 4.0; j2->rotation = r2; arm->list_joints.push_back(j2);
+    Joint* j3 = new Joint(); j3->p.y = 6.0; j3->rotation = r3; arm->list_joints.push_back(j3);
+    Joint* j4 = new Joint(); j4->p.y = 8.0; j4->rotation = r4; arm->list_joints.push_back(j4);
     
     list_arm.push_back(arm);
-    
+
+    r1.normalize(); r2.normalize(); r3.normalize(); r4.normalize();
+
+    rodriguez(j1);
+
+
     // GLUT initialization
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
