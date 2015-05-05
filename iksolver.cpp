@@ -128,11 +128,20 @@ void keyBoardFunc(unsigned char key, int x, int y) {
 }
 
 Matrix4f rodriguez(Joint* j) {
+        Vector3f R(j->rotation.x, j->rotation.y, j->rotation.z);
+        cout << "R normal = " << R << endl;
+        Vector unit = j->rotation;
+        unit.normalize();
         Matrix3f crossProd(3,3);
-        crossProd(0,0) = 0.0f; crossProd(0, 1) =  -(j->rotation.z); crossProd(0,2) = j->rotation.y;
-        crossProd(1,0) = j->rotation.z; crossProd(1, 1) = 0.0; crossProd(1,2) = -(j->rotation.x);
-        crossProd(2,0) = -(j->rotation.y); crossProd(2, 1) = j->rotation.x; crossProd(2,2) = 0.0;
-        cout << crossProd << endl;
+        crossProd(0,0) = 0.0f; crossProd(0, 1) =  -(unit.z); crossProd(0,2) = unit.y;
+        crossProd(1,0) = unit.z; crossProd(1, 1) = 0.0; crossProd(1,2) = -(unit.x);
+        crossProd(2,0) = -(unit.y); crossProd(2, 1) = unit.x; crossProd(2,2) = 0.0;
+
+        //r*rT
+        Vector3f r(unit.x, unit.y, unit.z);
+        cout << "r = " << r << endl;
+        cout << "cross product = " << crossProd << endl;
+        return (r * r.transpose()) + sin(j->rotation.magnitude()) * crossProd - cos(j->rotation.magnitude())*crossProd*crossProd * R;
     }
 
 int main (int argc, char **argv) {
