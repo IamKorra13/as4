@@ -23,15 +23,21 @@ Matrix4f Joint::transformation() {
 
 Matrix4f Joint::rodrigues() {
         Vector3f R; R << rotation(0), rotation(1), rotation(2);
-
+/*
         // if 0 vector
         if(R.norm() <= 0.0f) {
         	Matrix4f result;
         	result << MatrixXf::Zero(4, 4);
         	return result;
         }
+*/
+  		if(R.norm() > 0.0f) {
+  			R.normalize();
+  		}
+        
 
-        R.normalize();
+        Matrix3f identity;
+        identity << Matrix3f::Identity();
 
         Matrix3f crossProd(3,3);
         crossProd(0,0) = 0.0f; crossProd(0, 1) =  -(R(0)); crossProd(0,2) = R(1);
@@ -43,7 +49,8 @@ Matrix4f Joint::rodrigues() {
 
         float theta = rotation.norm();
 
-        MatrixXf result = (R * R.transpose()) + sin(theta) * crossProd - cos(theta)*crossProd_squ;
+        MatrixXf result = identity + sin(theta) * crossProd + (1-cos(theta))*crossProd_squ;
+        cout << "result matrix: " << endl << result;
         result.conservativeResize(4,4);
         result(0, 3) = 0.0f; result(1, 3) = 0.0f; result(2,3) = 0.0f; result(3,3) = 1.0f;
         result(3, 0) = 0.0f; result(3, 1) = 0.0f; result(3,2) = 0.0f;
