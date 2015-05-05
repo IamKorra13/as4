@@ -3,6 +3,7 @@
 Joint::Joint() {
     length = 2.0f;
     angle = 0.0f;
+    rotation = Vector();
     
 }
 

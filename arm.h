@@ -16,6 +16,7 @@ class Joint
         Joint();
         float length;
         float angle;
+        Vector rotation;
 };
 
 
@@ -26,7 +27,10 @@ class Arm
         vector<Joint*> list_joints;
         Vector base;
         Vector target;
+        vector<Vector> rotations;
         float step_size;
+    
+        Vector get_endpoint(vector<Vector>);
 };
 
 #endif

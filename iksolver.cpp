@@ -114,8 +114,6 @@ void keyBoardFunc(unsigned char key, int x, int y) {
     }
 }
 
-
-
 int main (int argc, char **argv) {
     // initialize the arm and joints
     Arm* arm = new Arm();
