@@ -48,7 +48,7 @@ Vector g = Vector();
 
 void drawArm(Arm* arm) {
     glPushMatrix();
-    glTranslatef(arm->base.x, arm->base.y, 0.0f);
+    glTranslatef(arm->base(0), arm->base(1), arm->base(2));
     glutSolidSphere(0.5f, 20, 20);
     
     GLUquadricObj *quad = gluNewQuadric();
@@ -60,9 +60,9 @@ void drawArm(Arm* arm) {
         Joint* joint = arm->list_joints[i];
         
         glColor3f(1.0, 0.0, 1.0);
-        glRotatef(joint->rotation.x, 1.0f, 0.0f, 0.0f);
-        glRotatef(joint->rotation.y, 0.0f, 1.0f, 0.0f);
-        glRotatef(joint->rotation.z, 0.0f, 0.0f, 1.0f);
+        glRotatef(joint->rotation(0), 1.0f, 0.0f, 0.0f);
+        glRotatef(joint->rotation(1), 0.0f, 1.0f, 0.0f);
+        glRotatef(joint->rotation(2), 0.0f, 0.0f, 1.0f);
         gluCylinder(quad, 0.2, 0.2, joint->length, 20, 20);
         glTranslatef(0, 0, joint->length);
         
@@ -132,22 +132,30 @@ void keyBoardFunc(unsigned char key, int x, int y) {
 int main (int argc, char **argv) {
     // initialize the arm and joints
     Arm* arm = new Arm();
-    vector<Vector> bigTheta;
 
-    //All angles ri = 0
-    Vector r1 = Vector(); r1.x = 30; r1.y = 60; r1.z = 90; bigTheta.push_back(r1);
-    Vector r2 = Vector(); bigTheta.push_back(r2);
-    Vector r3 = Vector(); bigTheta.push_back(r3);
-    Vector r4 = Vector(); bigTheta.push_back(r4);
-    //Rotation should be a matrix
-    Joint* j1 = new Joint(); j1->rotation = r1; arm->list_joints.push_back(j1);
-    Joint* j2 = new Joint(); j2->rotation = r2; arm->list_joints.push_back(j2);
-    Joint* j3 = new Joint(); j3->rotation = r3; arm->list_joints.push_back(j3);
-    Joint* j4 = new Joint(); j4->rotation = r4; arm->list_joints.push_back(j4);
+    Joint* j1 = new Joint(); arm->list_joints.push_back(j1);
+    Joint* j2 = new Joint(); arm->list_joints.push_back(j2);
+    Joint* j3 = new Joint(); arm->list_joints.push_back(j3);
+    Joint* j4 = new Joint(); arm->list_joints.push_back(j4);
+
+    //j1->rotation << 30.0f, 60.0f, 80.0f;
+
+    vector<Vector3f> bigTheta = vector<Vector3f>();
+    bigTheta.push_back(j1->rotation);
+    bigTheta.push_back(j2->rotation);
+    bigTheta.push_back(j3->rotation);
+    bigTheta.push_back(j4->rotation);
     
     list_arm.push_back(arm);
 
+    arm->list_joints[0]->print();
+
+    cout << endl;
     arm->list_joints[0]->rodrigues();
+    cout << endl << endl;
+    arm->list_joints[0]->transformation();
+    cout << endl;
+    arm->F(bigTheta);
 
     // GLUT initialization
     glutInit(&argc, argv);

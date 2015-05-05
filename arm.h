@@ -15,11 +15,12 @@ class Joint
     public:
         Joint();
         float length;
-        Vector rotation;
-        Vector p;
+        Vector3f rotation;
+        Vector3f p;
 
         Matrix4f rodrigues();
         Matrix4f transformation();
+        void print();
 };
 
 
@@ -28,12 +29,12 @@ class Arm
     public:
         Arm();
         vector<Joint*> list_joints;
-        Vector base;
-        Vector target;
-        vector<Vector> rotations;
+        Vector3f base;
+        Vector3f target;
         float step_size;
         
-        Vector F(vector<Vector>); /* get endpoint of the arm */
+        Vector4f F(vector<Vector3f>); /* get endpoint of the arm */
+        void print();
 };
 
 #endif
