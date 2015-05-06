@@ -99,6 +99,7 @@ Vector4f Arm::F(vector<Vector3f> theta) {
 }
 
 MatrixXf Arm::jacobian(vector<Vector3f> theta) {
+	float epsilon = 0.0005;
 	MatrixXf result(3, 12);
 	Vector3f endpoint; endpoint << F(theta);
 
@@ -106,5 +107,17 @@ MatrixXf Arm::jacobian(vector<Vector3f> theta) {
 
 	//
 	vector<Vector3f> add = vector<Vector3f>();
-	result(0, 0) = (F())
+	for(int i = 0; i < 3; i++) {
+		add[i] = theta[i];
+	}
+	vector<Vector3f> subtract = vector<Vector3f>();
+	for(int i = 0; i < 3; i++) {
+		subtract[i] = theta[i];
+	}
+	add[1](0) += epsilon;
+	subtract[1](0) -= epsilon;
+	cout << "Theta:" << endl << theta[0] << theta[1] << theta[2] << theta[3];
+	cout << "add:" << endl << add[0] << add[1] << add[2] << add[3];
+	cout << "subtract:" << endl << subtract[0] << subtract[1] << subtract[2] << subtract[3];
+	//result(0, 0) = (F(add) - F(subtract))/ (2*epsilon);
 }

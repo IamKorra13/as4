@@ -158,6 +158,7 @@ int main (int argc, char **argv) {
     arm->list_joints[0]->transformation();
     cout << endl;
     arm->F(bigTheta);
+    arm->jacobian(bigTheta);
 
     // GLUT initialization
     glutInit(&argc, argv);
