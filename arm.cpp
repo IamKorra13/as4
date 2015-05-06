@@ -16,6 +16,7 @@ Arm::Arm() {
 Matrix4f Joint::transformation() {
 	Matrix4f result;
 	result << Matrix4f::Identity();
+	cout << "arm length: " << length;
 	result(0,3) = length;
 	//cout << result;
 	return result;
@@ -80,7 +81,7 @@ Vector3f Arm::F(vector<Vector3f> theta) {
     Matrix4f T4; T4 = list_joints[0]->transformation();
 
     Vector4f identity(0.0, 0.0, 0.0, 1.0);
-    VectorXf result;
+    Vector4f result;
 
     result = R1 * T1 * R2 * T2 * R3 * T3 * R4 * T4 * identity;
 
@@ -94,10 +95,10 @@ Vector3f Arm::F(vector<Vector3f> theta) {
     cout << "T4:" << endl << T1 << endl;
 
     cout << "R1 * T1: " << R1 * T1 << endl;
-    cout << "result: " << endl << result;
-    result.conservativeResize(3);
-
-    return result;
+    
+    Vector3f ret(result(0), result(1), result(2));
+    cout << "ret: " << endl << ret << endl;
+    return ret;
 }
 
 MatrixXf Arm::jacobian(vector<Vector3f> theta) {
@@ -109,18 +110,19 @@ MatrixXf Arm::jacobian(vector<Vector3f> theta) {
 
 	vector<Vector3f> add = vector<Vector3f>();
 	for(int i = 0; i < 3; i++) {
-		add[i] = theta[i];
+		add.push_back(theta[i]);
 	}
 	vector<Vector3f> subtract = vector<Vector3f>();
 	for(int i = 0; i < 3; i++) {
-		subtract[i] = theta[i];
+		subtract.push_back(theta[i]);
 	}
 	
-	add[1](0) += epsilon;
-	subtract[1](0) -= epsilon;
+	add[0](0) += epsilon;
+	subtract[0](0) -= epsilon;
 
-	cout << "Theta:" << endl << theta[0] << theta[1] << theta[2] << theta[3];
-	cout << "add:" << endl << add[0] << add[1] << add[2] << add[3];
-	cout << "subtract:" << endl << subtract[0] << subtract[1] << subtract[2] << subtract[3];
-	//result(0, 0) = (F(add) - F(subtract))/ (2*epsilon);
+	//cout << "Theta:" << endl << theta[0] << endl << theta[1] << endl << theta[2] << endl << theta[3];
+	//cout << "add:" << endl << add[0] << endl << add[1] << endl << add[2] << endl << add[3];
+	//cout << "subtract:" << endl << subtract[0] << subtract[1] << subtract[2] << subtract[3];
+	result(0, 0) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+	cout << "Jacobian: " << endl << result;
 }

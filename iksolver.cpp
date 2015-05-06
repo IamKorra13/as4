@@ -135,10 +135,10 @@ int main (int argc, char **argv) {
     // initialize the arm and joints
     Arm* arm = new Arm();
 
-    Joint* j1 = new Joint(); arm->list_joints.push_back(j1);
-    Joint* j2 = new Joint(); arm->list_joints.push_back(j2);
-    Joint* j3 = new Joint(); arm->list_joints.push_back(j3);
-    Joint* j4 = new Joint(); arm->list_joints.push_back(j4);
+    Joint* j1 = new Joint(); j1->length = 1.0f; arm->list_joints.push_back(j1);
+    Joint* j2 = new Joint(); j2->length = 2.0f; arm->list_joints.push_back(j2);
+    Joint* j3 = new Joint(); j3->length = 3.0f; arm->list_joints.push_back(j3);
+    Joint* j4 = new Joint(); j4->length = 4.0f; arm->list_joints.push_back(j4);
 
     //j1->rotation << 30.0f, 60.0f, 80.0f;
 
