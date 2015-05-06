@@ -34,8 +34,8 @@ class Arm
         float step_size;
         
         Matrix4f rodrigues(Vector3f);
-        Vector3f F(vector<Vector3f>); /* get endpoint of the arm */
-        MatrixXf jacobian(vector<Vector3f>);
+        Vector3f F(VectorXf); /* get endpoint of the arm */
+        MatrixXf jacobian(VectorXf);
         void print();
 };
 

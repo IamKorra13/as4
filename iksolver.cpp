@@ -142,12 +142,21 @@ int main (int argc, char **argv) {
 
     //j1->rotation << 30.0f, 60.0f, 80.0f;
 
-    vector<Vector3f> bigTheta = vector<Vector3f>();
-    bigTheta.push_back(j1->rotation);
-    bigTheta.push_back(j2->rotation);
-    bigTheta.push_back(j3->rotation);
-    bigTheta.push_back(j4->rotation);
-    
+    VectorXf bigTheta; bigTheta << arm->list_joints[0]->rotation(0);
+        /*arm->list_joints[0]->rotation(1),
+        arm->list_joints[0]->rotation(2),
+        arm->list_joints[1]->rotation(0),
+        arm->list_joints[1]->rotation(1),
+        arm->list_joints[1]->rotation(2),
+        arm->list_joints[2]->rotation(0),
+        arm->list_joints[2]->rotation(1),
+        arm->list_joints[2]->rotation(2),
+        arm->list_joints[3]->rotation(0),
+        arm->list_joints[3]->rotation(1),
+        arm->list_joints[3]->rotation(2);*/
+
+    cout << bigTheta;
+
     list_arm.push_back(arm);
 
     arm->list_joints[0]->print();

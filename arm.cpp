@@ -30,14 +30,7 @@ void Joint::print() {
 
 Matrix4f Arm::rodrigues(Vector3f rot) {
         Vector3f R; R << rot(0), rot(1), rot(2);
-/*
-        // if 0 vector
-        if(R.norm() <= 0.0f) {
-        	Matrix4f result;
-        	result << MatrixXf::Zero(4, 4);
-        	return result;
-        }
-*/
+
   		if(R.norm() > 0.0f) {
   			R.normalize();
   		}
@@ -57,34 +50,35 @@ Matrix4f Arm::rodrigues(Vector3f rot) {
         float theta = rot.norm();
 
         MatrixXf result = identity + sin(theta) * crossProd + (1-cos(theta))*crossProd_squ;
-        cout << "result matrix: " << endl << result;
+        //cout << "result matrix: " << endl << result;
         result.conservativeResize(4,4);
         result(0, 3) = 0.0f; result(1, 3) = 0.0f; result(2,3) = 0.0f; result(3,3) = 1.0f;
         result(3, 0) = 0.0f; result(3, 1) = 0.0f; result(3,2) = 0.0f;
 
-      	//cout << "R vector is: " << R(0) << R(1) << R(2) << endl;
-        //cout << "Rodrigues:" << endl << result;
         return result;
 }
 
 
-Vector3f Arm::F(vector<Vector3f> theta) {
-	
-    Matrix4f R1; R1 = rodrigues(theta[0]);
-    Matrix4f R2; R2 = rodrigues(theta[1]);
-    Matrix4f R3; R3 = rodrigues(theta[2]);
-    Matrix4f R4; R4 = rodrigues(theta[3]);
+Vector3f Arm::F(VectorXf theta) {
+	Vector3f rot1(theta(0), theta(1), theta(2));
+	Vector3f rot2(theta(3), theta(4), theta(5));
+	Vector3f rot3(theta(6), theta(7), theta(8));
+	Vector3f rot4(theta(9), theta(10), theta(11));
+    Matrix4f R1; R1 = rodrigues(rot1);
+    Matrix4f R2; R2 = rodrigues(rot2);
+    Matrix4f R3; R3 = rodrigues(rot3);
+    Matrix4f R4; R4 = rodrigues(rot4);
 
     Matrix4f T1; T1 = list_joints[0]->transformation();
-    Matrix4f T2; T2 = list_joints[0]->transformation();
-    Matrix4f T3; T3 = list_joints[0]->transformation();
-    Matrix4f T4; T4 = list_joints[0]->transformation();
+    Matrix4f T2; T2 = list_joints[1]->transformation();
+    Matrix4f T3; T3 = list_joints[2]->transformation();
+    Matrix4f T4; T4 = list_joints[3]->transformation();
 
     Vector4f identity(0.0, 0.0, 0.0, 1.0);
     Vector4f result;
 
     result = R1 * T1 * R2 * T2 * R3 * T3 * R4 * T4 * identity;
-
+/*
     cout << "R1:" << endl << R1 << endl;
     cout << "T1:" << endl << T1 << endl;
     cout << "R2:" << endl << R2 << endl;
@@ -93,32 +87,29 @@ Vector3f Arm::F(vector<Vector3f> theta) {
     cout << "T3:" << endl << T1 << endl;
     cout << "R4:" << endl << R1 << endl;
     cout << "T4:" << endl << T1 << endl;
-
-    cout << "R1 * T1: " << R1 * T1 << endl;
-    
+    */
     Vector3f ret(result(0), result(1), result(2));
+    cout << "Theta:" << endl << theta;
     cout << "ret: " << endl << ret << endl;
     return ret;
 }
 
-MatrixXf Arm::jacobian(vector<Vector3f> theta) {
+MatrixXf Arm::jacobian(VectorXf theta) {
 
-	float epsilon = 0.0005;
+	float epsilon = 0.005;
 	MatrixXf result(3, 12);
 	Vector3f endpoint; endpoint << F(theta);
 
 
-	vector<Vector3f> add = vector<Vector3f>();
-	for(int i = 0; i < 3; i++) {
-		add.push_back(theta[i]);
-	}
-	vector<Vector3f> subtract = vector<Vector3f>();
-	for(int i = 0; i < 3; i++) {
-		subtract.push_back(theta[i]);
-	}
+	VectorXf add;
+	VectorXf subtract;
 	
-	add[0](0) += epsilon;
-	subtract[0](0) -= epsilon;
+
+	// first element
+	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	add(0) += epsilon;
+	subtract(0) -= epsilon;
 
 	//cout << "Theta:" << endl << theta[0] << endl << theta[1] << endl << theta[2] << endl << theta[3];
 	//cout << "add:" << endl << add[0] << endl << add[1] << endl << add[2] << endl << add[3];
