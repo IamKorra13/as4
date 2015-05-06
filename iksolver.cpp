@@ -142,8 +142,8 @@ int main (int argc, char **argv) {
 
     //j1->rotation << 30.0f, 60.0f, 80.0f;
 
-    VectorXf bigTheta; bigTheta << arm->list_joints[0]->rotation(0);
-        /*arm->list_joints[0]->rotation(1),
+    VectorXf bigTheta(12); bigTheta << arm->list_joints[0]->rotation(0),
+        arm->list_joints[0]->rotation(1),
         arm->list_joints[0]->rotation(2),
         arm->list_joints[1]->rotation(0),
         arm->list_joints[1]->rotation(1),
@@ -153,7 +153,7 @@ int main (int argc, char **argv) {
         arm->list_joints[2]->rotation(2),
         arm->list_joints[3]->rotation(0),
         arm->list_joints[3]->rotation(1),
-        arm->list_joints[3]->rotation(2);*/
+        arm->list_joints[3]->rotation(2);
 
     cout << bigTheta;
 

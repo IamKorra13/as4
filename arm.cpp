@@ -101,8 +101,8 @@ MatrixXf Arm::jacobian(VectorXf theta) {
 	Vector3f endpoint; endpoint << F(theta);
 
 
-	VectorXf add;
-	VectorXf subtract;
+	VectorXf add(12);
+	VectorXf subtract(12);
 	
 
 	// first element
