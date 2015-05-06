@@ -67,7 +67,8 @@ Matrix4f Arm::rodrigues(Vector3f rot) {
 }
 
 
-Vector4f Arm::F(vector<Vector3f> theta) {
+Vector3f Arm::F(vector<Vector3f> theta) {
+	
     Matrix4f R1; R1 = rodrigues(theta[0]);
     Matrix4f R2; R2 = rodrigues(theta[1]);
     Matrix4f R3; R3 = rodrigues(theta[2]);
@@ -79,7 +80,7 @@ Vector4f Arm::F(vector<Vector3f> theta) {
     Matrix4f T4; T4 = list_joints[0]->transformation();
 
     Vector4f identity(0.0, 0.0, 0.0, 1.0);
-    Vector4f result;
+    VectorXf result;
 
     result = R1 * T1 * R2 * T2 * R3 * T3 * R4 * T4 * identity;
 
@@ -94,18 +95,18 @@ Vector4f Arm::F(vector<Vector3f> theta) {
 
     cout << "R1 * T1: " << R1 * T1 << endl;
     cout << "result: " << endl << result;
+    result.conservativeResize(3);
 
     return result;
 }
 
 MatrixXf Arm::jacobian(vector<Vector3f> theta) {
+
 	float epsilon = 0.0005;
 	MatrixXf result(3, 12);
 	Vector3f endpoint; endpoint << F(theta);
 
-	//finite differences
 
-	//
 	vector<Vector3f> add = vector<Vector3f>();
 	for(int i = 0; i < 3; i++) {
 		add[i] = theta[i];
@@ -114,8 +115,10 @@ MatrixXf Arm::jacobian(vector<Vector3f> theta) {
 	for(int i = 0; i < 3; i++) {
 		subtract[i] = theta[i];
 	}
+	
 	add[1](0) += epsilon;
 	subtract[1](0) -= epsilon;
+
 	cout << "Theta:" << endl << theta[0] << theta[1] << theta[2] << theta[3];
 	cout << "add:" << endl << add[0] << add[1] << add[2] << add[3];
 	cout << "subtract:" << endl << subtract[0] << subtract[1] << subtract[2] << subtract[3];
