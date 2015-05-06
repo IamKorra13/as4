@@ -18,7 +18,7 @@ class Joint
         Vector3f rotation;
         Vector3f p;
 
-        Matrix4f rodrigues();
+        
         Matrix4f transformation();
         void print();
 };
@@ -33,9 +33,12 @@ class Arm
         Vector3f target;
         float step_size;
         
+        Matrix4f rodrigues(Vector3f);
         Vector4f F(vector<Vector3f>); /* get endpoint of the arm */
         MatrixXf jacobian(vector<Vector3f>);
         void print();
 };
+
+
 
 #endif

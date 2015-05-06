@@ -21,8 +21,14 @@ Matrix4f Joint::transformation() {
 	return result;
 }
 
-Matrix4f Joint::rodrigues() {
-        Vector3f R; R << rotation(0), rotation(1), rotation(2);
+void Joint::print() {
+	cout << "Length: " << length << endl;
+	cout << "Rotation: " << rotation << endl;
+}
+
+
+Matrix4f Arm::rodrigues(Vector3f rot) {
+        Vector3f R; R << rot(0), rot(1), rot(2);
 /*
         // if 0 vector
         if(R.norm() <= 0.0f) {
@@ -47,7 +53,7 @@ Matrix4f Joint::rodrigues() {
         Matrix3f crossProd_squ(3,3);
         crossProd_squ = crossProd * crossProd;
 
-        float theta = rotation.norm();
+        float theta = rot.norm();
 
         MatrixXf result = identity + sin(theta) * crossProd + (1-cos(theta))*crossProd_squ;
         cout << "result matrix: " << endl << result;
@@ -60,16 +66,12 @@ Matrix4f Joint::rodrigues() {
         return result;
 }
 
-void Joint::print() {
-	cout << "Length: " << length << endl;
-	cout << "Rotation: " << rotation << endl;
-}
 
 Vector4f Arm::F(vector<Vector3f> theta) {
-    Matrix4f R1; R1 = list_joints[0]->rodrigues();
-    Matrix4f R2; R2 = list_joints[1]->rodrigues();
-    Matrix4f R3; R3 = list_joints[2]->rodrigues();
-    Matrix4f R4; R4 = list_joints[3]->rodrigues();
+    Matrix4f R1; R1 = rodrigues(theta[0]);
+    Matrix4f R2; R2 = rodrigues(theta[1]);
+    Matrix4f R3; R3 = rodrigues(theta[2]);
+    Matrix4f R4; R4 = rodrigues(theta[3]);
 
     Matrix4f T1; T1 = list_joints[0]->transformation();
     Matrix4f T2; T2 = list_joints[0]->transformation();
@@ -98,7 +100,7 @@ Vector4f Arm::F(vector<Vector3f> theta) {
 
 MatrixXf Arm::jacobian(vector<Vector3f> theta) {
 	MatrixXf result(3, 12);
-	Vector3f endpoint = F(theta);
+	Vector3f endpoint; endpoint << F(theta);
 
 	//finite differences
 

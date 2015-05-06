@@ -129,6 +129,8 @@ void keyBoardFunc(unsigned char key, int x, int y) {
 
 
 
+
+
 int main (int argc, char **argv) {
     // initialize the arm and joints
     Arm* arm = new Arm();
@@ -151,7 +153,7 @@ int main (int argc, char **argv) {
     arm->list_joints[0]->print();
 
     cout << endl;
-    arm->list_joints[0]->rodrigues();
+    arm->rodrigues(arm->list_joints[0]->rotation);
     cout << endl << endl;
     arm->list_joints[0]->transformation();
     cout << endl;
