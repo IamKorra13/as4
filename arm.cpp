@@ -95,3 +95,14 @@ Vector4f Arm::F(vector<Vector3f> theta) {
 
     return result;
 }
+
+MatrixXf Arm::jacobian(vector<Vector3f> theta) {
+	MatrixXf result(3, 12);
+	Vector3f endpoint = F(theta);
+
+	//finite differences
+
+	//
+	vector<Vector3f> add = vector<Vector3f>();
+	result(0, 0) = (F())
+}
