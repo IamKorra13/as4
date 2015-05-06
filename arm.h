@@ -36,6 +36,7 @@ class Arm
         Matrix4f rodrigues(Vector3f);
         Vector3f F(VectorXf); /* get endpoint of the arm */
         MatrixXf jacobian(VectorXf);
+        MatrixXf psuedo_inv_jacobian(MatrixXf);
         void print();
 };
 

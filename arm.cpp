@@ -94,6 +94,20 @@ Vector3f Arm::F(VectorXf theta) {
     return ret;
 }
 
+MatrixXf Arm::psuedo_inv_jacobian(MatrixXf J) {
+	MatrixXf result (3, 12);
+	MatrixXf temp(3,12);
+	MatrixXf result_inv(13, 3);
+
+	temp << J * J.transpose();
+	cout << "temp: " << endl <<  temp;
+	result_inv << temp.inverse();
+
+	result = J.transpose() * result_inv;
+	cout << "psuedo inverse: " << endl << result;
+	return result;
+}
+
 MatrixXf Arm::jacobian(VectorXf theta) {
 
 	float epsilon = 0.005;
@@ -105,15 +119,185 @@ MatrixXf Arm::jacobian(VectorXf theta) {
 	VectorXf subtract(12);
 	
 
-	// first element
+	// Fx/rx1
 	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
 	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
 	add(0) += epsilon;
 	subtract(0) -= epsilon;
-
-	//cout << "Theta:" << endl << theta[0] << endl << theta[1] << endl << theta[2] << endl << theta[3];
-	//cout << "add:" << endl << add[0] << endl << add[1] << endl << add[2] << endl << add[3];
-	//cout << "subtract:" << endl << subtract[0] << subtract[1] << subtract[2] << subtract[3];
 	result(0, 0) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+
+	// Fy/rx1
+	result(1, 0) = (F(add)(1) - F(subtract)(1))/ (2*epsilon);
+
+	// Fz/rx1
+	result(2, 0) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
+
+	/////////////////////////
+
+	// Fx/ry1
+	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	add(1) += epsilon;
+	subtract(1) -= epsilon;
+	result(0, 1) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+
+	// Fy/ry1
+	result(1, 1) = (F(add)(1) - F(subtract)(1))/ (2*epsilon);
+
+	// Fz/ry1
+	result(2, 1) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
+
+	/////////////////////////
+
+	// Fx/rz1
+	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	add(2) += epsilon;
+	subtract(2) -= epsilon;
+	result(0, 2) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+
+	// Fy/rz1
+	result(1, 2) = (F(add)(1) - F(subtract)(1))/ (2*epsilon);
+
+	// Fz/rz1
+	result(2, 2) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
+
+	/////////////////////////
+
+	// Fx/rx2
+	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	add(3) += epsilon;
+	subtract(3) -= epsilon;
+	result(0, 3) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+
+	// Fy/rx2
+	result(1, 3) = (F(add)(1) - F(subtract)(1))/ (2*epsilon);
+
+	// Fz/rx2
+	result(2, 3) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
+
+	/////////////////////////
+
+	// Fx/ry2
+	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	add(4) += epsilon;
+	subtract(4) -= epsilon;
+	result(0, 4) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+
+	// Fy/rx2
+	result(1, 4) = (F(add)(1) - F(subtract)(1))/ (2*epsilon);
+
+	// Fz/rx2
+	result(2, 4) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
+
+		/////////////////////////
+
+	// Fx/rz2
+	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	add(5) += epsilon;
+	subtract(5) -= epsilon;
+	result(0, 5) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+
+	// Fy/rz2
+	result(1, 5) = (F(add)(1) - F(subtract)(1))/ (2*epsilon);
+
+	// Fz/rz2
+	result(2, 5) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
+
+			/////////////////////////
+
+	// Fx/rx3
+	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	add(6) += epsilon;
+	subtract(6) -= epsilon;
+	result(0, 6) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+
+	// Fy/rx3
+	result(1, 6) = (F(add)(1) - F(subtract)(1))/ (2*epsilon);
+
+	// Fz/rx3
+	result(2, 6) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
+
+				/////////////////////////
+
+	// Fx/ry3
+	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	add(7) += epsilon;
+	subtract(7) -= epsilon;
+	result(0, 7) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+
+	// Fy/rx3
+	result(1, 7) = (F(add)(1) - F(subtract)(1))/ (2*epsilon);
+
+	// Fz/rx3
+	result(2, 7) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
+
+				/////////////////////////
+
+	// Fx/rz3
+	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	add(8) += epsilon;
+	subtract(8) -= epsilon;
+	result(0, 8) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+
+	// Fy/rx3
+	result(1, 8) = (F(add)(1) - F(subtract)(1))/ (2*epsilon);
+
+	// Fz/rx3
+	result(2, 8) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
+
+				/////////////////////////
+
+	// Fx/rx4
+	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	add(9) += epsilon;
+	subtract(9) -= epsilon;
+	result(0, 9) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+
+	// Fy/rx3
+	result(1, 9) = (F(add)(1) - F(subtract)(1))/ (2*epsilon);
+
+	// Fz/rx3
+	result(2, 9) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
+
+
+				/////////////////////////
+
+	// Fx/ry4
+	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	add(10) += epsilon;
+	subtract(10) -= epsilon;
+	result(0, 10) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+
+	// Fy/rx3
+	result(1, 10) = (F(add)(1) - F(subtract)(1))/ (2*epsilon);
+
+	// Fz/rx3
+	result(2, 10) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
+
+					/////////////////////////
+
+	// Fx/ry4
+	add << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	subtract << theta(0), theta(1), theta(2), theta(3), theta(4), theta(5), theta(6), theta(7), theta(8), theta(9), theta(10), theta(11);
+	add(11) += epsilon;
+	subtract(11) -= epsilon;
+	result(0, 11) = (F(add)(0) - F(subtract)(0))/ (2*epsilon);
+
+	// Fy/rx3
+	result(1, 11) = (F(add)(1) - F(subtract)(1))/ (2*epsilon);
+
+	// Fz/rx3
+	result(2, 11) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
+
+
 	cout << "Jacobian: " << endl << result;
 }
