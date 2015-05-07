@@ -40,14 +40,10 @@ Viewport	viewport;
 int windowID;
 
 vector<Arm*> list_arm = vector<Arm*>();
-// The initial location of point P
-Vector p = Vector(); 
-//Goal point 
-Vector g = Vector();
+Vector p = Vector(); // The initial location of point P
+vector<Vector3f> goals = vector<Vector3f>();
 
-VectorXf bigTheta(12);
-
-Vector3f error;
+VectorXf bigTheta(12); // the rotations of the arm
 
 
 void updateJoints(Arm* arm, VectorXf bigTheta) {
@@ -66,11 +62,18 @@ void updateJoints(Arm* arm, VectorXf bigTheta) {
 }
 
 void solver(Arm* arm) {
+    Vector3f error;
     error = arm->C(bigTheta);
     VectorXf newBigTheta(12);
     int i = 0;
-     // while(error.norm() >= 0.001f) {
-        if (error.norm() >= 0.001f) {
+
+    // get a new goal if reached old one
+    if(error.norm() <= 0.1f && goals.size() > 0) {
+        arm->goal = goals.back(); goals.pop_back();
+    }
+
+
+    if (error.norm() >= 0.1f) {
         newBigTheta = arm->update(bigTheta);
         updateJoints(arm, newBigTheta);
 
@@ -89,6 +92,8 @@ void solver(Arm* arm) {
         }
     }
     cout << "Arm ending position: " << arm->F(bigTheta);
+
+
     return;
 }
 
@@ -230,6 +235,12 @@ void processSpecialKeys(int key, int x, int y) {
 }
 
 int main (int argc, char **argv) {
+    // initialize goals
+    Vector3f goal1(-2.0f, -3.0f, -1.0f);
+    Vector3f goal2(2.0f, 3.0f, 1.0f);
+    Vector3f goal3(0.0f, 0.0f, 4.0f);
+    goals.push_back(goal1); goals.push_back(goal2); goals.push_back(goal3);
+
     // initialize the arm and joints
     Arm* arm = new Arm();
 
@@ -255,10 +266,7 @@ int main (int argc, char **argv) {
 
     list_arm.push_back(arm);
 
-    ///////
-
-    Vector3f goal(-2.0f, -3.0f, -1.0f);
-    arm->goal = goal;
+    arm->goal = goals.back(); goals.pop_back();
     arm->step_size = 0.5f;
 /*
     cout << endl;

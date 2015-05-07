@@ -10,7 +10,7 @@ Joint::Joint() {
 Arm::Arm() {
     list_joints = vector<Joint*>();
     base << 0, 0, 0;
-    target << 4, 0, 0;
+    goal << 4, 0, 0;
 }
 
 Matrix4f Joint::transformation() {

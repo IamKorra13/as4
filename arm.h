@@ -31,9 +31,9 @@ class Arm
         Arm();
         vector<Joint*> list_joints;
         Vector3f base;
-        Vector3f target;
-        float step_size;
         Vector3f goal;
+        float step_size;
+        
         //VectorXf bigTheta;
         
         Matrix4f rodrigues(Vector3f);
