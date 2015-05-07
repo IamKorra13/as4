@@ -11,23 +11,12 @@ Arm::Arm() {
     list_joints = vector<Joint*>();
     base << 0, 0, 0;
     target << 4, 0, 0;
-    //bigTheta.resize(12);
-    /*
-    int k = 0;
-    for(int i = 0; i < list_joints.size(); i++) {
-    	bigTheta(k) = list_joints[i]->rotation(0);
-    	bigTheta(k+1) = list_joints[i]->rotation(1);
-    	bigTheta(k+2) = list_joints[i]->rotation(2);
-    	k += 3;
-    }*/
 }
 
 Matrix4f Joint::transformation() {
 	Matrix4f result;
 	result << Matrix4f::Identity();
-	cout << "arm length: " << length;
 	result(0,3) = length;
-	//cout << result;
 	return result;
 }
 
@@ -59,7 +48,7 @@ Matrix4f Arm::rodrigues(Vector3f rot) {
         float theta = rot.norm();
 
         MatrixXf result = identity + sin(theta) * crossProd + (1-cos(theta))*crossProd_squ;
-        //cout << "result matrix: " << endl << result;
+
         result.conservativeResize(4,4);
         result(0, 3) = 0.0f; result(1, 3) = 0.0f; result(2,3) = 0.0f; result(3,3) = 1.0f;
         result(3, 0) = 0.0f; result(3, 1) = 0.0f; result(3,2) = 0.0f;
@@ -89,8 +78,6 @@ Vector3f Arm::F(VectorXf theta) {
     result = R1 * T1 * R2 * T2 * R3 * T3 * R4 * T4 * identity;
 
     Vector3f ret(result(0), result(1), result(2));
-    cout << "Theta:" << endl << theta;
-    cout << "ret: " << endl << ret << endl;
     return ret;
 }
 
@@ -129,7 +116,6 @@ MatrixXf Arm::psuedo_inv_jacobian(VectorXf theta) {
 
 	result = svd.matrixV() * sigma * svd.matrixU().transpose();
 
-	cout << "psuedo inverse: " << endl << result;
 	return result;
 }
 
@@ -324,18 +310,15 @@ MatrixXf Arm::jacobian(VectorXf theta) {
 	result(2, 11) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
 
 	return result;
-	cout << "Jacobian: " << endl << result;
 }
 
 Vector3f Arm::C(VectorXf theta) {
 	Vector3f result = F(theta) - goal;
-	cout << "C is: " << endl << result;
 	return result;
 }
 
 VectorXf Arm::update(VectorXf theta) {
 	VectorXf newTheta(12);
 	newTheta = theta - psuedo_inv_jacobian(theta) * C(theta) * step_size;
-	cout << "newTheta:" << endl << newTheta;
 	return newTheta;
 }

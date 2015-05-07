@@ -80,9 +80,6 @@ void drawArm(Arm* arm) {
     glPopMatrix();
 }
 
-void drawGoal() {
-    
-}
 /* Main display function. */
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -95,11 +92,12 @@ void display() {
     
     /// stuff here
     drawArm(list_arm[0]);
-    drawGoal();
     glPopMatrix();
     
     glFlush();
     glutSwapBuffers();					// swap buffers (we earlier set double buffer)
+
+     glutPostRedisplay();
 }
 
 
@@ -153,11 +151,19 @@ void updateJoints(Arm* arm, VectorXf bigTheta) {
 
 void solver(Arm* arm) {
     Vector3f error = arm->C(bigTheta);
+    cout << "asdf";
     while(error.norm() >= 0.001f) {
         bigTheta = arm->update(bigTheta);
         updateJoints(arm, bigTheta);
-        drawArm(arm);
+        //glutPostRedisplay();
+        //drawArm(arm);
+        //display();
+        error = arm->C(bigTheta);
+        cout << "error is: " << error << endl << endl;
+        cout << "endpoint is: " << arm->F(bigTheta) << endl;
     }
+
+    display();
 }
 
 
@@ -208,7 +214,6 @@ int main (int argc, char **argv) {
 */
     //////
 
-    solver(arm);
 
     // GLUT initialization
     glutInit(&argc, argv);
@@ -245,9 +250,14 @@ int main (int argc, char **argv) {
     
     initScene();
     glutDisplayFunc(display);
+
+solver(arm);
+
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyBoardFunc);
     glutMainLoop();
     
+    
+
     return 0;
 }
