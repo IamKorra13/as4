@@ -11,6 +11,15 @@ Arm::Arm() {
     list_joints = vector<Joint*>();
     base << 0, 0, 0;
     target << 4, 0, 0;
+    //bigTheta.resize(12);
+    /*
+    int k = 0;
+    for(int i = 0; i < list_joints.size(); i++) {
+    	bigTheta(k) = list_joints[i]->rotation(0);
+    	bigTheta(k+1) = list_joints[i]->rotation(1);
+    	bigTheta(k+2) = list_joints[i]->rotation(2);
+    	k += 3;
+    }*/
 }
 
 Matrix4f Joint::transformation() {
@@ -78,32 +87,48 @@ Vector3f Arm::F(VectorXf theta) {
     Vector4f result;
 
     result = R1 * T1 * R2 * T2 * R3 * T3 * R4 * T4 * identity;
-/*
-    cout << "R1:" << endl << R1 << endl;
-    cout << "T1:" << endl << T1 << endl;
-    cout << "R2:" << endl << R2 << endl;
-    cout << "T2:" << endl << T2 << endl;
-    cout << "R3:" << endl << R1 << endl;
-    cout << "T3:" << endl << T1 << endl;
-    cout << "R4:" << endl << R1 << endl;
-    cout << "T4:" << endl << T1 << endl;
-    */
+
     Vector3f ret(result(0), result(1), result(2));
     cout << "Theta:" << endl << theta;
     cout << "ret: " << endl << ret << endl;
     return ret;
 }
 
-MatrixXf Arm::psuedo_inv_jacobian(MatrixXf J) {
-	MatrixXf result (3, 12);
-	MatrixXf temp(3,12);
-	MatrixXf result_inv(13, 3);
+MatrixXf Arm::psuedo_inv_jacobian(VectorXf theta) {
+	MatrixXf J = jacobian(theta);
 
-	temp << J * J.transpose();
-	cout << "temp: " << endl <<  temp;
-	result_inv << temp.inverse();
+	float epsilon = 0.0001f;
+	MatrixXf result (12, 3);
+	Matrix3f sigma(3, 3);
 
-	result = J.transpose() * result_inv;
+	JacobiSVD<MatrixXf> svd(J, ComputeThinU | ComputeThinV);
+	Vector3f singularValues = svd.singularValues();
+
+	float sigma1, sigma2, sigma3;
+	if(singularValues(0) < epsilon) {
+		sigma1 = 0.0f;
+	} else {
+		sigma1 = 1/singularValues(0);
+	}
+
+	if(singularValues(1) < epsilon) {
+		sigma2 = 0.0f;
+	} else {
+		sigma2 = 1/singularValues(1);
+	}
+
+	if(singularValues(2) < epsilon) {
+		sigma3 = 0.0f;
+	} else {
+		sigma3 = 1/singularValues(2);
+	}
+
+	sigma << sigma1, 0, 0,
+			0, sigma2, 0,
+			0, 0, sigma3;
+
+	result = svd.matrixV() * sigma * svd.matrixU().transpose();
+
 	cout << "psuedo inverse: " << endl << result;
 	return result;
 }
@@ -298,6 +323,19 @@ MatrixXf Arm::jacobian(VectorXf theta) {
 	// Fz/rx3
 	result(2, 11) = (F(add)(2) - F(subtract)(2))/ (2*epsilon);
 
-
+	return result;
 	cout << "Jacobian: " << endl << result;
+}
+
+Vector3f Arm::C(VectorXf theta) {
+	Vector3f result = F(theta) - goal;
+	cout << "C is: " << endl << result;
+	return result;
+}
+
+VectorXf Arm::update(VectorXf theta) {
+	VectorXf newTheta(12);
+	newTheta = theta - psuedo_inv_jacobian(theta) * C(theta) * step_size;
+	cout << "newTheta:" << endl << newTheta;
+	return newTheta;
 }

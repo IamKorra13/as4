@@ -45,6 +45,8 @@ Vector p = Vector();
 //Goal point 
 Vector g = Vector();
 
+VectorXf bigTheta(12);
+
 
 void drawArm(Arm* arm) {
     glPushMatrix();
@@ -127,7 +129,36 @@ void keyBoardFunc(unsigned char key, int x, int y) {
     }
 }
 
+void updateBigTheta(Arm* arm) {
+    bigTheta << arm->list_joints[0]->rotation(0),
+        arm->list_joints[0]->rotation(1),
+        arm->list_joints[0]->rotation(2),
+        arm->list_joints[1]->rotation(0),
+        arm->list_joints[1]->rotation(1),
+        arm->list_joints[1]->rotation(2),
+        arm->list_joints[2]->rotation(0),
+        arm->list_joints[2]->rotation(1),
+        arm->list_joints[2]->rotation(2),
+        arm->list_joints[3]->rotation(0),
+        arm->list_joints[3]->rotation(1),
+        arm->list_joints[3]->rotation(2);
+}
 
+void updateJoints(Arm* arm, VectorXf bigTheta) {
+    arm->list_joints[0]->rotation << bigTheta(0), bigTheta(1), bigTheta(2);
+    arm->list_joints[1]->rotation << bigTheta(3), bigTheta(4), bigTheta(5);
+    arm->list_joints[2]->rotation << bigTheta(6), bigTheta(7), bigTheta(8);
+    arm->list_joints[3]->rotation << bigTheta(9), bigTheta(10), bigTheta(11);
+}
+
+void solver(Arm* arm) {
+    Vector3f error = arm->C(bigTheta);
+    while(error.norm() >= 0.001f) {
+        bigTheta = arm->update(bigTheta);
+        updateJoints(arm, bigTheta);
+        drawArm(arm);
+    }
+}
 
 
 
@@ -136,13 +167,13 @@ int main (int argc, char **argv) {
     Arm* arm = new Arm();
 
     Joint* j1 = new Joint(); j1->length = 1.0f; arm->list_joints.push_back(j1);
-    Joint* j2 = new Joint(); j2->length = 2.0f; arm->list_joints.push_back(j2);
-    Joint* j3 = new Joint(); j3->length = 3.0f; arm->list_joints.push_back(j3);
-    Joint* j4 = new Joint(); j4->length = 4.0f; arm->list_joints.push_back(j4);
+    Joint* j2 = new Joint(); j2->length = 1.0f; arm->list_joints.push_back(j2);
+    Joint* j3 = new Joint(); j3->length = 1.0f; arm->list_joints.push_back(j3);
+    Joint* j4 = new Joint(); j4->length = 1.0f; arm->list_joints.push_back(j4);
 
     //j1->rotation << 30.0f, 60.0f, 80.0f;
 
-    VectorXf bigTheta(12); bigTheta << arm->list_joints[0]->rotation(0),
+    bigTheta << arm->list_joints[0]->rotation(0),
         arm->list_joints[0]->rotation(1),
         arm->list_joints[0]->rotation(2),
         arm->list_joints[1]->rotation(0),
@@ -155,20 +186,29 @@ int main (int argc, char **argv) {
         arm->list_joints[3]->rotation(1),
         arm->list_joints[3]->rotation(2);
 
-    cout << bigTheta;
-
     list_arm.push_back(arm);
 
-    arm->list_joints[0]->print();
+    ///////
 
+    Vector3f goal(0.0f, 4.0f, 0.0f);
+    arm->goal = goal;
+    arm->step_size = 0.5f;
+/*
     cout << endl;
+
     arm->rodrigues(arm->list_joints[0]->rotation);
     cout << endl << endl;
     arm->list_joints[0]->transformation();
     cout << endl;
     arm->F(bigTheta);
     MatrixXf j(3, 12); j = arm->jacobian(bigTheta);
-    arm->psuedo_inv_jacobian(j);
+    arm->C(bigTheta);
+    arm->psuedo_inv_jacobian(bigTheta);
+    arm->update(bigTheta);
+*/
+    //////
+
+    solver(arm);
 
     // GLUT initialization
     glutInit(&argc, argv);

@@ -5,6 +5,7 @@
 #include <vector>
 #include "vector.cpp"
 #include "Eigen/Dense"
+#include "Eigen/SVD"
 
 using namespace Eigen;
 using namespace std;
@@ -32,11 +33,15 @@ class Arm
         Vector3f base;
         Vector3f target;
         float step_size;
+        Vector3f goal;
+        //VectorXf bigTheta;
         
         Matrix4f rodrigues(Vector3f);
         Vector3f F(VectorXf); /* get endpoint of the arm */
         MatrixXf jacobian(VectorXf);
-        MatrixXf psuedo_inv_jacobian(MatrixXf);
+        MatrixXf psuedo_inv_jacobian(VectorXf);
+        Vector3f C(VectorXf);
+        VectorXf update(VectorXf);
         void print();
 };
 
