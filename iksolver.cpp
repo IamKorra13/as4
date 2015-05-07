@@ -47,6 +47,8 @@ Vector g = Vector();
 
 VectorXf bigTheta(12);
 
+Vector3f error;
+
 
 void updateJoints(Arm* arm, VectorXf bigTheta) {
     cout << "Updating the rotations" << endl;
@@ -64,10 +66,11 @@ void updateJoints(Arm* arm, VectorXf bigTheta) {
 }
 
 void solver(Arm* arm) {
-    Vector3f error = arm->C(bigTheta);
+    error = arm->C(bigTheta);
     VectorXf newBigTheta(12);
     int i = 0;
-     while(error.norm() >= 0.001f) {
+     // while(error.norm() >= 0.001f) {
+        if (error.norm() >= 0.001f) {
         newBigTheta = arm->update(bigTheta);
         updateJoints(arm, newBigTheta);
 
@@ -81,7 +84,8 @@ void solver(Arm* arm) {
 
         // goal is out of reach
         if(arm->step_size <= 0.003f) {
-            break;
+            cout << "Out of reach" << endl;
+            // break;
         }
     }
     return;
