@@ -84,6 +84,7 @@ void solver(Arm* arm) {
             break;
         }
     }
+    cout << "Arm ending position: " << arm->F(bigTheta);
     return;
 }
 
@@ -103,8 +104,6 @@ void drawArm(Arm* arm) {
         Joint* joint = arm->list_joints[i];
         
         glColor3f(1.0, 0.0, 1.0);
-        cout << "drawing the rotations" << endl;
-        cout << joint->rotation << endl;
         glRotatef(joint->rotation(0), 1.0f, 0.0f, 0.0f);
         glRotatef(joint->rotation(1), 0.0f, 1.0f, 0.0f);
         glRotatef(joint->rotation(2), 0.0f, 0.0f, 1.0f);
