@@ -127,6 +127,19 @@ void keyBoardFunc(unsigned char key, int x, int y) {
     }
 }
 
+// This function is called when there is nothing else to do.
+void idle ()
+{
+    glutPostRedisplay();
+}
+
+// This function gets called every 10ms
+void timer(int i)
+{
+    glutTimerFunc(10, timer, i);
+    glutPostRedisplay();
+}
+
 void updateBigTheta(Arm* arm) {
     bigTheta << arm->list_joints[0]->rotation(0),
         arm->list_joints[0]->rotation(1),
@@ -251,10 +264,12 @@ int main (int argc, char **argv) {
     initScene();
     glutDisplayFunc(display);
 
-solver(arm);
+    solver(arm);
 
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyBoardFunc);
+    glutIdleFunc(idle);
+    glutTimerFunc(60, timer, 0);
     glutMainLoop();
     
     
