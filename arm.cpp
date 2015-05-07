@@ -2,7 +2,7 @@
 
 Joint::Joint() {
     length = 2.0f;
-    rotation << 0.0f, 0.0f, 0.0f;
+    rotation << 0.0f, 0.0f, 90.0f;
     p << 0.0f, 0.0f, 0.0f;
     
 }
@@ -25,7 +25,7 @@ Arm::Arm() {
 Matrix4f Joint::transformation() {
 	Matrix4f result;
 	result << Matrix4f::Identity();
-	cout << "arm length: " << length;
+	// cout << "arm length: " << length;
 	result(0,3) = length;
 	//cout << result;
 	return result;
@@ -89,8 +89,8 @@ Vector3f Arm::F(VectorXf theta) {
     result = R1 * T1 * R2 * T2 * R3 * T3 * R4 * T4 * identity;
 
     Vector3f ret(result(0), result(1), result(2));
-    cout << "Theta:" << endl << theta;
-    cout << "ret: " << endl << ret << endl;
+    // cout << "Theta:" << endl << theta;
+    // cout << "ret: " << endl << ret << endl;
     return ret;
 }
 
@@ -129,7 +129,7 @@ MatrixXf Arm::psuedo_inv_jacobian(VectorXf theta) {
 
 	result = svd.matrixV() * sigma * svd.matrixU().transpose();
 
-	cout << "psuedo inverse: " << endl << result;
+	// cout << "psuedo inverse: " << endl << result;
 	return result;
 }
 

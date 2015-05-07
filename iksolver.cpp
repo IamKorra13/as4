@@ -49,7 +49,9 @@ VectorXf bigTheta(12);
 
 
 void drawArm(Arm* arm) {
+    cout << "Print";
     glPushMatrix();
+    cout << "About to translate the arm base" << endl;
     glTranslatef(arm->base(0), arm->base(1), arm->base(2));
     glutSolidSphere(0.5f, 20, 20);
     
@@ -62,6 +64,8 @@ void drawArm(Arm* arm) {
         Joint* joint = arm->list_joints[i];
         
         glColor3f(1.0, 0.0, 1.0);
+        cout << "drawing the rotations" << endl;
+        cout << joint->rotation << endl;
         glRotatef(joint->rotation(0), 1.0f, 0.0f, 0.0f);
         glRotatef(joint->rotation(1), 0.0f, 1.0f, 0.0f);
         glRotatef(joint->rotation(2), 0.0f, 0.0f, 1.0f);
@@ -70,7 +74,7 @@ void drawArm(Arm* arm) {
         
         // Draw the sphere to show the joint position
         if (i < 3) {
-            glutSolidSphere(0.5, 20, 20);
+            glutSolidSphere(0.3, 20, 20);
         }
     }
     //draw P
@@ -116,7 +120,7 @@ void reshape(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     // gluOrtho2D(10, viewport.w, 10, viewport.h);
-    int num = 12;
+    int num = 5;
     glOrtho(-num, num, -num, num, num, -num);
     
 }
@@ -128,6 +132,8 @@ void keyBoardFunc(unsigned char key, int x, int y) {
             exit(0);
     }
 }
+
+
 
 void updateBigTheta(Arm* arm) {
     bigTheta << arm->list_joints[0]->rotation(0),
@@ -145,22 +151,55 @@ void updateBigTheta(Arm* arm) {
 }
 
 void updateJoints(Arm* arm, VectorXf bigTheta) {
+    cout << "Updating the rotations" << endl;
     arm->list_joints[0]->rotation << bigTheta(0), bigTheta(1), bigTheta(2);
+    cout << "rotation 1:" << endl << arm->list_joints[0]->rotation << endl;
+    
     arm->list_joints[1]->rotation << bigTheta(3), bigTheta(4), bigTheta(5);
+    cout << "rotation 2:" << endl << arm->list_joints[1]->rotation << endl;
+    
     arm->list_joints[2]->rotation << bigTheta(6), bigTheta(7), bigTheta(8);
+    cout << "rotation 3:" << endl << arm->list_joints[2]->rotation << endl;
+    
     arm->list_joints[3]->rotation << bigTheta(9), bigTheta(10), bigTheta(11);
+    cout << "rotation 4:" << endl << arm->list_joints[3]->rotation << endl;
 }
 
 void solver(Arm* arm) {
     Vector3f error = arm->C(bigTheta);
-    while(error.norm() >= 0.001f) {
+    int i = 0;
+    // while(error.norm() >= 0.001f) {
+        while(i < 20) {
         bigTheta = arm->update(bigTheta);
         updateJoints(arm, bigTheta);
-        drawArm(arm);
+        cout << "About to draw the arm" << endl;
+        // drawArm(arm);
+        display();
+        i++;
     }
 }
 
+void processSpecialKeys(int key, int x, int y) {
+    int mod = glutGetModifiers();
+    switch(key) {
+        case GLUT_KEY_RIGHT:
+            if(mod == GLUT_ACTIVE_SHIFT) {
+                Vector3f error = list_arm[0]->C(bigTheta);
+                bigTheta = list_arm[0]->update(bigTheta);
+                updateJoints(list_arm[0], bigTheta);
+                // translate_x += 0.3f;
+            }
+            else {
+                Vector3f error = list_arm[0]->C(bigTheta);
+                bigTheta = list_arm[0]->update(bigTheta);
+                updateJoints(list_arm[0], bigTheta);
 
+                // rotate_x -= 10.0f;myD
+            }
+            display();
+            break;
+    }
+}
 
 int main (int argc, char **argv) {
     // initialize the arm and joints
@@ -208,7 +247,6 @@ int main (int argc, char **argv) {
 */
     //////
 
-    solver(arm);
 
     // GLUT initialization
     glutInit(&argc, argv);
@@ -242,12 +280,18 @@ int main (int argc, char **argv) {
     
     glEnable(GL_LIGHT0);
     
-    
+
     initScene();
     glutDisplayFunc(display);
+
+    // solver(arm);
+    
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyBoardFunc);
+    glutSpecialFunc(processSpecialKeys);
+
     glutMainLoop();
     
     return 0;
 }
+
