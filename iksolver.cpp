@@ -48,17 +48,44 @@ float step = 0.05f;
 
 
 void updateJoints(Arm* arm, VectorXf bigTheta, VectorXf oldTheta) {
+    Joint* j1 = arm->list_joints[0];
+    Joint* j2 = arm->list_joints[1];
+    Joint* j3 = arm->list_joints[2];
+    Joint* j4 = arm->list_joints[3];
+    
+    j1->rotation << bigTheta(0), bigTheta(1), bigTheta(2);
+    j2->rotation << bigTheta(3), bigTheta(4), bigTheta(5);
+    j3->rotation << bigTheta(6), bigTheta(7), bigTheta(8);
+    j4->rotation << bigTheta(9), bigTheta(10), bigTheta(11);
+    
+
+    /*
+    j1->rotation << bigTheta(0), bigTheta(1), bigTheta(2);
+    j2->rotation << bigTheta(3) * j1->rotation(0), bigTheta(4) * j1->rotation(1), bigTheta(5) * j1->rotation(2);
+    j3->rotation << bigTheta(6) * j2->rotation(0) * j1->rotation(0), bigTheta(7) * j2->rotation(1) * j1->rotation(0), bigTheta(8) * j2->rotation(2) * j1->rotation(0);
+    j4->rotation << bigTheta(9) * j3->rotation(0) * j2->rotation(0) * j1->rotation(0), bigTheta(10) * j3->rotation(1) * j2->rotation(0) * j1->rotation(0), bigTheta(11) * j3->rotation(2) * j2->rotation(0) * j1->rotation(0);
+    */
+    /*
+    arm->list_joints[0]->rotation << bigTheta(0) + oldTheta(0), bigTheta(1) + oldTheta(1), bigTheta(2) + oldTheta(2);
+    arm->list_joints[1]->rotation << bigTheta(3) + oldTheta(3), bigTheta(4) + oldTheta(4), bigTheta(5) + oldTheta(5);
+    arm->list_joints[2]->rotation << bigTheta(6) + oldTheta(6), bigTheta(7) + oldTheta(7), bigTheta(8) + oldTheta(8);
+    arm->list_joints[3]->rotation << bigTheta(9) + oldTheta(9), bigTheta(10) + oldTheta(10), bigTheta(11) + oldTheta(11);
+    */
+
+
     arm->list_joints[0]->rotation << bigTheta(0) * oldTheta(0), bigTheta(1) * oldTheta(1), bigTheta(2) * oldTheta(2);
     arm->list_joints[1]->rotation << bigTheta(3) * oldTheta(3), bigTheta(4) * oldTheta(4), bigTheta(5) * oldTheta(5);
     arm->list_joints[2]->rotation << bigTheta(6) * oldTheta(6), bigTheta(7) * oldTheta(7), bigTheta(8) * oldTheta(8);
     arm->list_joints[3]->rotation << bigTheta(9) * oldTheta(9), bigTheta(10) * oldTheta(10), bigTheta(11) * oldTheta(11);
+    
+    
 }
 
 void solver(Arm* arm) {
     Vector3f error;
     error = arm->C(bigTheta);
     VectorXf newBigTheta(12);
-    float step_tolerance = 0.00005f;
+    float step_tolerance = 0.005f;
     int i = 0;
 
     // get a new goal if reached old one
@@ -121,6 +148,11 @@ void drawArm(Arm* arm) {
         
         glColor3f(1.0, 0.0, 1.0);
         glRotatef(rot.norm(), rot(0), rot(1), rot(2));
+        /*
+        glRotatef(rot(0), 1.0f, 0.0f, 0.0f);
+        glRotatef(rot(1), 0.0f, 1.0f, 0.0f);
+        glRotatef(rot(2), 0.0f, 0.0f, 1.0f);
+        */
         gluCylinder(quad, 0.2, 0.2, joint->length, 20, 20);
         glTranslatef(0, 0, joint->length);
         
@@ -243,15 +275,15 @@ int main (int argc, char **argv) {
     
     
     Vector3f goal1(0.0f, 11.0f, 0.0f); goals.push_back(goal1); // right 
-    Vector3f goal2(0.0f, 20.0f, 10.0f); goals.push_back(goal2); // down 
-    Vector3f goal3(20.0f, 10.0f, 0.0f); goals.push_back(goal3); // left
-    Vector3f goal4(0.0f, -3.0f, -11.0f); goals.push_back(goal4);
-    //Vector3f goal5(11.0f, 0.0f, 11.0f); goals.push_back(goal5);
+    // Vector3f goal2(0.0f, 20.0f, -10.0f); goals.push_back(goal2); // down 
+    // Vector3f goal3(20.0f, 10.0f, 0.0f); goals.push_back(goal3); // left
+    // Vector3f goal4(0.0f, -3.0f, -11.0f); goals.push_back(goal4);
+    // Vector3f goal5(11.0f, 0.0f, 11.0f); goals.push_back(goal5);
     
-    //Vector3f goal3(200.0f, 100.0f, 0.0f); goals.push_back(goal3);
-    //Vector3f goal4(0.0f, -30.0f, -110.0f); goals.push_back(goal4);
-    //Vector3f goal2(0.0f, 200.0f, 100.0f); goals.push_back(goal2);
-    //Vector3f goal1(0.0f, 100.0f, 0.0f); goals.push_back(goal1);
+    // Vector3f goal3(200.0f, 100.0f, 0.0f); goals.push_back(goal3);
+    // Vector3f goal4(0.0f, -30.0f, -110.0f); goals.push_back(goal4);
+    // Vector3f goal2(0.0f, 200.0f, 100.0f); goals.push_back(goal2);
+    // Vector3f goal1(0.0f, 100.0f, 0.0f); goals.push_back(goal1);
     
     
        
