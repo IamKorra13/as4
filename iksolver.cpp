@@ -57,26 +57,13 @@ void solver(Arm* arm) {
     Vector3f error;
     error = arm->C(bigTheta);
     VectorXf newBigTheta(12);
-    float step_tolerance = 0.0005;
+    float step_tolerance = 0.00005f;
     int i = 0;
 
     // get a new goal if reached old one
     if(error.norm() <= 0.1f && goals.size() > 0) {
         arm->step_size = 0.5f;
         arm->goal = goals.back(); goals.pop_back();
-    }
-
-    // goal is out of reach and there's still a new goal
-    if(arm->step_size <= step_tolerance && goals.size() > 0) {
-        cout << "Out of reach" << endl;
-        arm->step_size = 0.5f;
-        arm->goal = goals.back(); goals.pop_back();
-        // break;
-    }
-
-    // goal is just out of reach
-    if(arm->step_size <= step_tolerance) {
-        return;
     }
 
     if (error.norm() >= 0.1f) {
@@ -88,6 +75,19 @@ void solver(Arm* arm) {
         if(newError.norm()/error.norm() > 1.0f) {
             arm->step_size = arm->step_size/2.0f;
         }
+
+            // goal is out of reach and there's still a new goal
+    if(arm->step_size <= step_tolerance && goals.size() > 0) {
+        cout << "Out of reach" << endl;
+        arm->step_size = 0.08f;
+        arm->goal = goals.back(); goals.pop_back();
+        // break;
+    }
+
+    // goal is just out of reach
+    if(arm->step_size <= step_tolerance) {
+        return;
+    }
         bigTheta = newBigTheta;
         error = newError;
 
@@ -239,17 +239,19 @@ void processSpecialKeys(int key, int x, int y) {
 
 int main (int argc, char **argv) {
     // initialize goals
-    /*
+    
+    
     Vector3f goal1(0.0f, 11.0f, 0.0f); goals.push_back(goal1); // right 
     Vector3f goal2(0.0f, 20.0f, 10.0f); goals.push_back(goal2); // down 
     Vector3f goal3(20.0f, 10.0f, 0.0f); goals.push_back(goal3); // left
     Vector3f goal4(0.0f, -3.0f, -11.0f); goals.push_back(goal4);
-    */
-
-    Vector3f goal1(0.0f, 100.0f, 0.0f); goals.push_back(goal1); // right 
-    Vector3f goal2(0.0f, 200.0f, 100.0f); goals.push_back(goal2); // down 
-    Vector3f goal3(200.0f, 100.0f, 0.0f); goals.push_back(goal3); // left
-    Vector3f goal4(0.0f, -30.0f, -110.0f); goals.push_back(goal4);
+    
+    //Vector3f goal3(200.0f, 100.0f, 0.0f); goals.push_back(goal3);
+    //Vector3f goal4(0.0f, -30.0f, -110.0f); goals.push_back(goal4);
+    //Vector3f goal2(0.0f, 200.0f, 100.0f); goals.push_back(goal2);
+    //Vector3f goal1(0.0f, 100.0f, 0.0f); goals.push_back(goal1);
+    
+    
        
 
     // initialize the arm and joints
@@ -278,7 +280,7 @@ int main (int argc, char **argv) {
     list_arm.push_back(arm);
 
     arm->goal = goals.back(); goals.pop_back();
-    arm->step_size = 0.5f;
+    arm->step_size = 0.08f;
 
 
     // GLUT initialization
