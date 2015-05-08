@@ -9,7 +9,7 @@ Joint::Joint() {
 
 Arm::Arm() {
     list_joints = vector<Joint*>();
-    base << 0, 0, 0;
+    base << 0.0f, 0.0f, 0.0f;
     goal << 4, 0, 0;
 }
 
