@@ -47,11 +47,11 @@ VectorXf bigTheta(12); // the rotations of the arm
 float step = 0.05f;
 
 
-void updateJoints(Arm* arm, VectorXf bigTheta) {
-    arm->list_joints[0]->rotation << bigTheta(0), bigTheta(1), bigTheta(2);
-    arm->list_joints[1]->rotation << bigTheta(3), bigTheta(4), bigTheta(5);
-    arm->list_joints[2]->rotation << bigTheta(6), bigTheta(7), bigTheta(8);
-    arm->list_joints[3]->rotation << bigTheta(9), bigTheta(10), bigTheta(11);
+void updateJoints(Arm* arm, VectorXf bigTheta, VectorXf oldTheta) {
+    arm->list_joints[0]->rotation << bigTheta(0) * oldTheta(0), bigTheta(1) * oldTheta(1), bigTheta(2) * oldTheta(2);
+    arm->list_joints[1]->rotation << bigTheta(3) * oldTheta(3), bigTheta(4) * oldTheta(4), bigTheta(5) * oldTheta(5);
+    arm->list_joints[2]->rotation << bigTheta(6) * oldTheta(6), bigTheta(7) * oldTheta(7), bigTheta(8) * oldTheta(8);
+    arm->list_joints[3]->rotation << bigTheta(9) * oldTheta(9), bigTheta(10) * oldTheta(10), bigTheta(11) * oldTheta(11);
 }
 
 void solver(Arm* arm) {
@@ -69,7 +69,7 @@ void solver(Arm* arm) {
 
     if (error.norm() >= 0.1f) {
         newBigTheta = arm->update(bigTheta);
-        updateJoints(arm, newBigTheta);
+        updateJoints(arm, newBigTheta, bigTheta);
 
         //update step size
         Vector3f newError = arm->C(newBigTheta);
@@ -223,13 +223,13 @@ void processSpecialKeys(int key, int x, int y) {
             if(mod == GLUT_ACTIVE_SHIFT) {
                 Vector3f error = list_arm[0]->C(bigTheta);
                 bigTheta = list_arm[0]->update(bigTheta);
-                updateJoints(list_arm[0], bigTheta);
+                //updateJoints(list_arm[0], bigTheta);
                 // translate_x += 0.3f;
             }
             else {
                 Vector3f error = list_arm[0]->C(bigTheta);
                 bigTheta = list_arm[0]->update(bigTheta);
-                updateJoints(list_arm[0], bigTheta);
+                //updateJoints(list_arm[0], bigTheta);
 
                 // rotate_x -= 10.0f;myD
             }
@@ -246,7 +246,7 @@ int main (int argc, char **argv) {
     Vector3f goal2(0.0f, 20.0f, 10.0f); goals.push_back(goal2); // down 
     Vector3f goal3(20.0f, 10.0f, 0.0f); goals.push_back(goal3); // left
     Vector3f goal4(0.0f, -3.0f, -11.0f); goals.push_back(goal4);
-    Vector3f goal5(11.0f, 0.0f, 11.0f); goals.push_back(goal5);
+    //Vector3f goal5(11.0f, 0.0f, 11.0f); goals.push_back(goal5);
     
     //Vector3f goal3(200.0f, 100.0f, 0.0f); goals.push_back(goal3);
     //Vector3f goal4(0.0f, -30.0f, -110.0f); goals.push_back(goal4);
