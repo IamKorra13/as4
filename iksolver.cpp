@@ -44,6 +44,7 @@ Vector p = Vector(); // The initial location of point P
 vector<Vector3f> goals = vector<Vector3f>();
 
 VectorXf bigTheta(12); // the rotations of the arm
+float step = 0.05f;
 
 
 void updateJoints(Arm* arm, VectorXf bigTheta) {
@@ -62,7 +63,7 @@ void solver(Arm* arm) {
 
     // get a new goal if reached old one
     if(error.norm() <= 0.1f && goals.size() > 0) {
-        arm->step_size = 0.5f;
+        arm->step_size = step;
         arm->goal = goals.back(); goals.pop_back();
     }
 
@@ -79,7 +80,7 @@ void solver(Arm* arm) {
             // goal is out of reach and there's still a new goal
     if(arm->step_size <= step_tolerance && goals.size() > 0) {
         cout << "Out of reach" << endl;
-        arm->step_size = 0.08f;
+        arm->step_size = step;
         arm->goal = goals.back(); goals.pop_back();
         // break;
     }
@@ -103,10 +104,12 @@ void solver(Arm* arm) {
 }
 
 void drawArm(Arm* arm) {
+
+
     glPushMatrix();
     glTranslatef(arm->base(0), arm->base(1), arm->base(2));
     glutSolidSphere(0.5f, 20, 20);
-    
+
     GLUquadricObj *quad = gluNewQuadric();
     gluQuadricDrawStyle(quad, GLU_FILL);
     gluQuadricOrientation(quad, GLU_OUTSIDE);
@@ -114,11 +117,10 @@ void drawArm(Arm* arm) {
     
     for (int i = 0; i < arm->list_joints.size(); i++) {
         Joint* joint = arm->list_joints[i];
+        Vector3f rot = joint->rotation;
         
         glColor3f(1.0, 0.0, 1.0);
-        glRotatef(joint->rotation(0), 1.0f, 0.0f, 0.0f);
-        glRotatef(joint->rotation(1), 0.0f, 1.0f, 0.0f);
-        glRotatef(joint->rotation(2), 0.0f, 0.0f, 1.0f);
+        glRotatef(rot.norm(), rot(0), rot(1), rot(2));
         gluCylinder(quad, 0.2, 0.2, joint->length, 20, 20);
         glTranslatef(0, 0, joint->length);
         
@@ -132,6 +134,8 @@ void drawArm(Arm* arm) {
     glutSolidSphere(0.5, 20, 20);
 
     glPopMatrix();
+
+
 }
 
 /* Main display function. */
@@ -142,16 +146,13 @@ void display() {
     glMatrixMode(GL_MODELVIEW);			        // indicate we are specifying camera transformations
     glLoadIdentity();
     
-    glPushMatrix();
     
     /// stuff here
     drawArm(list_arm[0]);
-    glPopMatrix();
     solver(list_arm[0]);
     
     glFlush();
     glutSwapBuffers();					// swap buffers (we earlier set double buffer)
-
      glutPostRedisplay();
 }
 
@@ -245,6 +246,7 @@ int main (int argc, char **argv) {
     Vector3f goal2(0.0f, 20.0f, 10.0f); goals.push_back(goal2); // down 
     Vector3f goal3(20.0f, 10.0f, 0.0f); goals.push_back(goal3); // left
     Vector3f goal4(0.0f, -3.0f, -11.0f); goals.push_back(goal4);
+    Vector3f goal5(11.0f, 0.0f, 11.0f); goals.push_back(goal5);
     
     //Vector3f goal3(200.0f, 100.0f, 0.0f); goals.push_back(goal3);
     //Vector3f goal4(0.0f, -30.0f, -110.0f); goals.push_back(goal4);
@@ -280,7 +282,7 @@ int main (int argc, char **argv) {
     list_arm.push_back(arm);
 
     arm->goal = goals.back(); goals.pop_back();
-    arm->step_size = 0.08f;
+    arm->step_size = step;
 
 
     // GLUT initialization
